@@ -1,0 +1,27 @@
+@startuml
+interface Stopable {
+	void stop();
+	void forceStop();
+	void resume();
+	void abort();
+	void shutdown();
+}
+abstract class AbstractElasticJob {
+	void enableJob();
+	void disableJob();
+	void onResharding();
+	void onForceStop();
+	void onTimeout();
+	void onNeedRaiseAlarm();
+}
+abstract class AbstractSaturnJob {
+}
+abstract class CrondJob {
+}
+
+
+Stopable  <|--  AbstractElasticJob
+AbstractElasticJob  <|--  AbstractSaturnJob
+AbstractSaturnJob  <|--  CrondJob
+
+@enduml
