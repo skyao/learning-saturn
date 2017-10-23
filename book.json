@@ -1,0 +1,37 @@
+{
+  "gitbook": ">=3.2.0",
+  "description": "Saturn学习笔记",
+  "language": "zh-hans",
+  "author": "Sky Ao <aoxiaojian@gmail.com>",
+  "extension": null,
+  "generator": "site",
+  "links" : {
+    "sidebar" : {
+        "Sky@Gitbook": "https://skyao.gitbooks.io"
+    }
+  },
+  "structure" : {
+    },
+  "plugins": [
+    "splitter",
+    "-search",
+    "-sharing",
+    "edit-link",
+    "back-to-top-button",
+    "github-buttons@2.1.0"
+  ],
+  "pluginsConfig": {
+    "edit-link": {
+        "base": "https://github.com/skyao/learning-saturn/edit/master",
+        "label": "Edit"
+    },
+    "github-buttons": {
+        "repo": "skyao/learning-saturn",
+        "types": ["star"],
+        "size": "small"
+    }
+  },
+  "title": "Saturn学习笔记",
+  "variables": {
+  }
+}
