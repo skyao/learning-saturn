@@ -1,27 +1,29 @@
 @startuml
 interface Stopable {
-	void stop();
-	void forceStop();
-	void resume();
-	void abort();
-	void shutdown();
 }
 abstract class AbstractElasticJob {
-	void enableJob();
-	void disableJob();
-	void onResharding();
-	void onForceStop();
-	void onTimeout();
-	void onNeedRaiseAlarm();
+	abstract void executeJob();
 }
 abstract class AbstractSaturnJob {
+    abstract Map handleJob();
+    abstract SaturnJobReturn doExecution();
 }
 abstract class CrondJob {
+}
+abstract class OnetimeJob {
+}
+class SaturnJavaJob {
+    SaturnJobReturn handleJavaJob();
+}
+class SaturnScriptJob {
 }
 
 
 Stopable  <|--  AbstractElasticJob
 AbstractElasticJob  <|--  AbstractSaturnJob
 AbstractSaturnJob  <|--  CrondJob
+AbstractSaturnJob  <|--  OnetimeJob
+CrondJob  <|--  SaturnJavaJob
+CrondJob  <|--  SaturnScriptJob
 
 @enduml

@@ -1,5 +1,7 @@
 # 类AbstractElasticJob
 
+弹性化分布式作业的基类.
+
 ## 类定义
 
 ```java
@@ -72,9 +74,32 @@ protected String jobVersion;
 去掉细节看主流程：
 
 ```java
+JobExecutionMultipleShardingContext shardingContext = null;
+	shardingContext = executionContextService.getJobExecutionShardingContext();
+	executeJobInternal(shardingContext);
+```
+
+基本上就一个事情，拿到shardingContext之后调用executeJobInternal()，完成一次Job的调用。
+
+继续看executeJobInternal()方法：
+
+```java
+try {
+    executeJob(shardingContext);
+} finally {
+	......
+}
+```
+
+最后调用到抽象方法executeJob()，由子类实现。
+
+### execute()前后作业状态变化
+
+running状态在reset时设置为true，然后通过finally设置为false。
+
+```java
 reset();
 
-JobExecutionMultipleShardingContext shardingContext = null;
 try {
 	shardingContext = executionContextService.getJobExecutionShardingContext();
 	executeJobInternal(shardingContext);
@@ -83,21 +108,21 @@ try {
 }
 ```
 
-基本上就一个事情，拿到shardingContext之后调用executeJobInternal()，完成一次Job的调用。
+### execute()前后服务器状态变化
 
-running状态在reset时设置为true，然后通过finally设置为false。
-
-继续看executeJobInternal()方法：
+如果需要汇报服务器状态，则在Job执行前，设置服务器状态为RUNNING:
 
 ```java
 executionService.registerJobBegin(shardingContext);
 
-try {
-    executeJob(shardingContext);
-} finally {
-	......
+public void registerJobBegin(......) {
+	serverService.updateServerStatus(ServerStatus.RUNNING);
 }
 ```
 
+执行作业之后，设置服务器状态为READY:
 
+```java
+serverService.updateServerStatus(ServerStatus.READY);
+```
 

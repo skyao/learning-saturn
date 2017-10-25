@@ -1,0 +1,61 @@
+@startuml
+
+hide footbox
+title Job Execution Process
+
+participant saturn
+participant job
+participant SaturnJavaJob
+participant executorService
+participant future
+participant ShardingItemFutureTask
+participant JavaShardingItemCallable
+
+
+saturn -> job: executeJob()
+job -> SaturnJavaJob: handleJob()
+
+loop "for each job partition"
+
+create JavaShardingItemCallable
+SaturnJavaJob -> JavaShardingItemCallable: new
+create ShardingItemFutureTask
+activate ShardingItemFutureTask #DarkSalmon
+SaturnJavaJob -> ShardingItemFutureTask: new
+
+par "multiple thread"
+
+SaturnJavaJob -> executorService: submit(task)
+
+create future
+executorService -> future: create
+executorService --> SaturnJavaJob: future
+
+SaturnJavaJob -> future: get()
+note left: waite for job
+
+
+
+executorService -> ShardingItemFutureTask: call()
+ShardingItemFutureTask -> JavaShardingItemCallable: call()
+JavaShardingItemCallable -> SaturnJavaJob: doExecution()
+SaturnJavaJob -[#red]> SaturnJavaJob: handleJavaJob()
+note right: do job business logic here!
+SaturnJavaJob --> JavaShardingItemCallable
+JavaShardingItemCallable --> ShardingItemFutureTask
+
+ShardingItemFutureTask --> executorService
+deactivate ShardingItemFutureTask
+end
+
+future --> SaturnJavaJob
+note left: job completed
+
+end
+
+SaturnJavaJob -> SaturnJavaJob: wait for all job partitions
+
+SaturnJavaJob --> job
+job --> saturn
+
+@enduml
